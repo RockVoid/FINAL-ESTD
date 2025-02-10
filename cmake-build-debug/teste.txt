@@ -1,0 +1,3 @@
+insert into tipo_pet(codigo, descricao) values(1, ‘cachorro’);
+insert into tipo_pet(codigo, descricao) values(2, ‘gato’);
+insert into pessoa(codigo, nome, fone) values(1, ‘joão’, ‘859995566’);
