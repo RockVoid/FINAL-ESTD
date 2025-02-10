@@ -5,8 +5,8 @@
 typedef struct {
     int code;
     char name[50];
-    char phone[14];
-    char birth[10];
+    char phone[20];
+    char birth[20];
     char address[100];
     struct client *next;
 } client;

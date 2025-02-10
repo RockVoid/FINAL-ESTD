@@ -69,8 +69,8 @@ client *create_client(const char *name,const char *address, const int code, cons
 
     strncpy(new_client->name, name, 50);
     strncpy(new_client->address, address, 100);
-    strncpy(new_client->phone, phone, 14);
-    strncpy(new_client->birth, birth, 10);
+    strncpy(new_client->phone, phone, 20);
+    strncpy(new_client->birth, birth, 20);
 
     new_client->code = code;
     new_client->next = NULL;
@@ -96,6 +96,8 @@ void serialize(client *lista, const char* filename) {
         fwrite(current->name, sizeof(char), 50, file);
         fwrite(current->address, sizeof(char), 100, file);
         fwrite(&(current->code), sizeof(int), 1, file);
+        fwrite(current->birth, sizeof(char), 20, file);
+        fwrite(current->phone, sizeof(char), 20, file);
         current = current->next;
     }
 
@@ -123,9 +125,11 @@ client* deserialize(const char* filename) {
         size_t nameReaded = fread(newClient->name, sizeof(char), 50, file);
         size_t addressReaded = fread(newClient->address, sizeof(char), 100, file);
         size_t codeReaded = fread(&(newClient->code), sizeof(int), 1, file);
+        size_t birthReaded = fread(newClient->birth, sizeof(char), 20, file);
+        size_t phoneReaded = fread(newClient->phone, sizeof(char), 20, file);
 
         // Eu queria melhorar esse if :P
-        if(nameReaded == 0 || addressReaded == 0 || codeReaded == 0) {
+        if(nameReaded == 0 || addressReaded == 0 || codeReaded == 0 || phoneReaded == 0 || birthReaded == 0) {
             free(newClient);
             break;
         }
@@ -155,10 +159,6 @@ void show_list(client* head) {
 int main() {
 
     client *lista = NULL;
-
-    add_client(&lista, "Roque", "Rua dos Tabajaras", "859857-8657", "12-08-2001", 101);
-
-    serialize(lista, "client_list.bin");
 
     client *lista_deserializada = deserialize("client_list.bin");
     show_list(lista_deserializada);
