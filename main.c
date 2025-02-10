@@ -1,38 +1,9 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include "struct_data.c"
 
 #define INSERT_COMMAND "insert into"
-/*
-typedef struct {
-    int code;
-    char *name;
-    char *phone;
-    char *birth;
-    char *address;
-} client;
-
-typedef struct {
-    int code;
-    char *desc;
-} pet_type;
-
-typedef struct {
-    int code;
-    int *code_client;
-    char *name;
-    char *pet_type_code;
-} pet;
-
-typedef struct {
-    char *desc;
-    struct comando *next;
-} command;
-
-typedef enum {
-    DO_INSERT,
-    COMMAND_NOT_RECOGNIZED
-} COMMAND_TO_DO;
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -43,40 +14,42 @@ COMMAND_TO_DO check_syntax(char *statement) {
     return COMMAND_NOT_RECOGNIZED;
 };
 
-char *sliceString(char *string, int start, int end) {
-    int i;
-    int size = (end - start) + 2;
-    char *output = (char *) malloc(size * sizeof(char));
+char* sliceString(const char* str, int start, int end) {
+    // Calculate the length of the substring
+    int length = end - start;
 
-    for (i = 0; start <= end; start++, i++)
-    {
-        output[i] = string[start];
+    // Allocate memory for the substring (+1 for the null terminator)
+    char* slicedStr = (char*)malloc((length + 1) * sizeof(char));
+    if (slicedStr == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return NULL;
     }
 
-    output[size] = '\0';
+    // Copy the substring from the original string
+    strncpy(slicedStr, str + start, length);
 
-    return output;
+    // Add the null terminator
+    slicedStr[length] = '\0';
+
+    return slicedStr;
 }
 
-char *get_table(char *statement, COMMAND_TO_DO command) {
+void get_table(char *statement, COMMAND_TO_DO command) {
     if(command == DO_INSERT) {
-        // pet 3
-        if(!strcmp(sliceString(statement, 12, 15), "pet")) {
-            printf("Tabela pet");
+        if(!strcmp(sliceString(statement, 12, 16), "pet(")) {
+            printf("Tabela pet\n");
             return;
         }
 
-        if(!strcmp(sliceString(statement, 12, 15), "pet")) {
-            printf("Tabela pet");
+        if(!strcmp(sliceString(statement, 12, 20), "pet_type")) {
+            printf("Tabela pet_type\n");
             return;
         }
 
-        if(!strcmp(sliceString(statement, 12, 15), "pet")) {
-            printf("Tabela pet");
+        if(!strcmp(sliceString(statement, 12, 18), "client")) {
+            printf("Tabela client\n");
             return;
         }
-        // pet_type 8
-        // client 6
     }
 }
 
@@ -84,46 +57,30 @@ void add_command(command **fila_de_comandos, char *statement) {
     switch(check_syntax(statement)) {
         case DO_INSERT:
             get_table(statement, DO_INSERT);
-            break;
+        break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando não reconhecido!");
-            break;
+        break;
     }
 }
 
-int main() {
-
-    command *fila_de_comandos = NULL;
-
-    add_command(&fila_de_comandos, "insert into pet(codigo, desc) values(1, 'cachorro');");
-
-    // INSERT INTO $TABLE(FIELD1,FIELD2,FIELD3) VALUES(CORRESPONDENT_FIELD1,CORRESPONDENT_FIELD2,CORRESPONDENT_FIELD3);
-
-    return 0;
-}
-*/
-
-typedef struct {
-    char name[50];
-    char address[100];
-    int code;
-    struct client* next;
-} client;
-
-client *create_client(const char *name,const char *address, int code) {
+client *create_client(const char *name,const char *address, const int code, const char* phone, const char* birth) {
     client *new_client = malloc(sizeof(client));
 
     strncpy(new_client->name, name, 50);
     strncpy(new_client->address, address, 100);
+    strncpy(new_client->phone, phone, 14);
+    strncpy(new_client->birth, birth, 10);
+
     new_client->code = code;
     new_client->next = NULL;
 
     return new_client;
 }
 
-void add_client(client **list, const char* name, const char* address, int code) {
-    client* new_client = create_client(name, address, code);
-    new_client->next = *list;
+void add_client(client **list, const char* name, const char* address, const char* phone, const char* birth, const int code) {
+    client* new_client = create_client(name, address, code, phone, birth);
+    new_client->next = (struct client*) *list;
     *list = new_client;
 }
 
@@ -172,13 +129,14 @@ client* deserialize(const char* filename) {
             free(newClient);
             break;
         }
-
+// head->primeiro_cliente
+// current -> new_cliente
         if(!head) {
             head = newClient;
             current = head;
         } else {
-            current->next = newClient;
-            current = current->next;
+            current->next = (struct client*) newClient;
+            current = (client*) current->next;
         }
     }
 
@@ -189,23 +147,25 @@ client* deserialize(const char* filename) {
 void show_list(client* head) {
     client* aux = head;
     while (aux) {
-        printf("Name: %s, Address: %s, Code: %d\n", aux->name, aux->address, aux->code);
-        aux = aux->next;
+        printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
+        aux = (client *) aux->next;
     }
 }
 
 int main() {
 
     client *lista = NULL;
-    add_client(&lista, "Roque", "Rua dos Tabajaras", 101);
+
+    add_client(&lista, "Roque", "Rua dos Tabajaras", "859857-8657", "12-08-2001", 101);
+
     serialize(lista, "client_list.bin");
+
     client *lista_deserializada = deserialize("client_list.bin");
     show_list(lista_deserializada);
 
+    free(lista_deserializada);
     return 0;
 }
-
-
 
 
 
