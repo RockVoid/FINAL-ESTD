@@ -32,35 +32,40 @@ char* sliceString(const char* str, int start, int end) {
     return slicedStr;
 }
 
-void check_table(const char *statement, COMMAND_TO_DO command) {
+char *check_table(const char *statement, COMMAND_TO_DO command) {
     char *table = NULL;
     if(command == DO_INSERT) {
         table = sliceString(statement, 12, 16);
         if(!strcmp(table, "pet(")) {
-            printf("Tabela pet\n");
             free(table);
-            return;
+            strcpy(table, "pet");
+            return table;
         }
 
         table = sliceString(statement, 12, 20);
         if(!strcmp(table, "pet_type")) {
-            printf("Tabela pet_type\n");
             free(table);
-            return;
+            return table;
         }
 
         table = sliceString(statement, 12, 18);
         if(!strcmp(table, "client")) {
-            printf("Tabela client\n");
             free(table);
+            return table;
         }
     }
+
+    return NULL;
 }
 
 void add_command(command **fila_de_comandos, char *statement) {
+
+    char *table = NULL;
+
     switch(check_syntax(statement)) {
         case DO_INSERT:
-            check_table(statement, DO_INSERT);
+            table = check_table(statement, DO_INSERT);
+            printf("%s", table);
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando não reconhecido!");
