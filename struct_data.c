@@ -2,7 +2,7 @@
 // Created by roque on 10/02/2025.
 //
 
-typedef struct {
+typedef struct client{
     int code;
     char name[50];
     char phone[20];
