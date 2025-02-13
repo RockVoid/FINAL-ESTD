@@ -41,21 +41,35 @@ char *check_table(const char *statement, COMMAND_TO_DO command) {
             strcpy(table, "pet");
             return table;
         }
+        free(table);
 
         table = sliceString(statement, 12, 20);
         if(!strcmp(table, "pet_type")) {
-            free(table);
             return table;
         }
+        free(table);
 
         table = sliceString(statement, 12, 18);
         if(!strcmp(table, "client")) {
-            free(table);
             return table;
         }
     }
-
+    free(table);
     return NULL;
+}
+
+void getFields(char *statement, COMMAND_TO_DO command, char *table) {
+    if(command == DO_INSERT && !strcmp(table, "pet")) {
+        printf("Voce ta querendo inserir na tabela pet!");
+    }
+
+    if(command == DO_INSERT && !strcmp(table, "pet_type")) {
+        printf("Voce ta querendo inserir na tabela pet_type!");
+    }
+
+    if(command == DO_INSERT && !strcmp(table, "client")) {
+        printf("Voce ta querendo inserir na tabela client!");
+    }
 }
 
 void add_command(command **fila_de_comandos, char *statement) {
@@ -65,10 +79,16 @@ void add_command(command **fila_de_comandos, char *statement) {
     switch(check_syntax(statement)) {
         case DO_INSERT:
             table = check_table(statement, DO_INSERT);
-            printf("%s", table);
+            if(!table) {
+                printf("Tabela nao reconhecida");
+                free(table);
+                return;
+            };
+            getFields(statement, DO_INSERT, table);
+            free(table);
         break;
         case COMMAND_NOT_RECOGNIZED:
-            printf("Comando não reconhecido!");
+            printf("Comando nao reconhecido!");
         break;
     }
 }
@@ -109,7 +129,7 @@ int main() {
 
     command *lista = NULL;
     printf("Testando comando insert: \n");
-    add_command(&lista, "insert into pet(");
+    add_command(&lista, "insert into dhfjahfk(name,phone,address,birth)");
 
 //    client *lista_deserializada = deserialize("client_list.bin");
 //    show_list(lista_deserializada);
