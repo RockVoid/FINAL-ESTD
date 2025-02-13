@@ -1,9 +1,11 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <ctype.h>
 #include "file_handler.c"
 
 #define INSERT_COMMAND "insert into"
+
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -15,40 +17,42 @@ COMMAND_TO_DO check_syntax(char *statement) {
 };
 
 char* sliceString(const char* str, int start, int end) {
-    // Calculate the length of the substring
     int length = end - start;
 
-    // Allocate memory for the substring (+1 for the null terminator)
-    char* slicedStr = (char*)malloc((length + 1) * sizeof(char));
+    char* slicedStr = malloc((length + 1) * sizeof(char));
     if (slicedStr == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
+        fprintf(stderr, "Não foi possivel alocar memoria.\n");
         return NULL;
     }
 
-    // Copy the substring from the original string
     strncpy(slicedStr, str + start, length);
 
-    // Add the null terminator
     slicedStr[length] = '\0';
 
     return slicedStr;
 }
 
-void get_table(char *statement, COMMAND_TO_DO command) {
+void check_table(const char *statement, COMMAND_TO_DO command) {
+    char *table = NULL;
     if(command == DO_INSERT) {
-        if(!strcmp(sliceString(statement, 12, 16), "pet(")) {
+        table = sliceString(statement, 12, 16);
+        if(!strcmp(table, "pet(")) {
             printf("Tabela pet\n");
+            free(table);
             return;
         }
 
-        if(!strcmp(sliceString(statement, 12, 20), "pet_type")) {
+        table = sliceString(statement, 12, 20);
+        if(!strcmp(table, "pet_type")) {
             printf("Tabela pet_type\n");
+            free(table);
             return;
         }
 
-        if(!strcmp(sliceString(statement, 12, 18), "client")) {
+        table = sliceString(statement, 12, 18);
+        if(!strcmp(table, "client")) {
             printf("Tabela client\n");
-            return;
+            free(table);
         }
     }
 }
@@ -56,7 +60,7 @@ void get_table(char *statement, COMMAND_TO_DO command) {
 void add_command(command **fila_de_comandos, char *statement) {
     switch(check_syntax(statement)) {
         case DO_INSERT:
-            get_table(statement, DO_INSERT);
+            check_table(statement, DO_INSERT);
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando não reconhecido!");
@@ -98,11 +102,13 @@ void show_list(client* head) {
 
 int main() {
 
-    client *lista = NULL;
+    command *lista = NULL;
+    printf("Testando comando insert: \n");
+    add_command(&lista, "insert into pet(");
 
-    client *lista_deserializada = deserialize("client_list.bin");
-    show_list(lista_deserializada);
+//    client *lista_deserializada = deserialize("client_list.bin");
+//    show_list(lista_deserializada);
 
-    free(lista_deserializada);
+//    free(lista_deserializada);
     return 0;
 }
