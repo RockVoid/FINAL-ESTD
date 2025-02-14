@@ -14,6 +14,7 @@ typedef struct client{
 typedef struct {
     int code;
     char desc[100];
+    struct pet_type *next;
 } pet_type;
 
 typedef struct {
@@ -21,6 +22,7 @@ typedef struct {
     int *code_client;
     char name[40];
     char *pet_type_code;
+    struct pet *next;
 } pet;
 
 typedef struct {
