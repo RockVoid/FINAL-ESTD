@@ -107,18 +107,17 @@ int extract_words(const char *quote, const char *keyword, char words[MAX_WORDS][
     return k + 1;  // Num palavras
 }
 
-void getFields(char *statement, COMMAND_TO_DO command, char *table) {
+int get_fields(char *statement, COMMAND_TO_DO command, char *table) {
     char finded_fields[MAX_WORDS][MAX_WORD_LENGTH];
     int num_fields = extract_words(statement, table, finded_fields);
 
     for (int i = 0; i < num_fields; i++) {
         if(strcmp(finded_fields[i], pet_table_fields[i]) != 0) {
             printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
+            return 0;
         }
     }
-
-    if(command == DO_INSERT && !strcmp(table, "pet")) {
-    }
+    return 1;
 }
 
 
@@ -135,7 +134,7 @@ void add_command(command **fila_de_comandos, char *statement) {
                 free(table);
                 return;
             };
-            getFields(statement, DO_INSERT, table);
+            get_fields(statement, DO_INSERT, table);
             free(table);
         break;
         case COMMAND_NOT_RECOGNIZED:
