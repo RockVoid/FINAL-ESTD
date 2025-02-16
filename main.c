@@ -5,7 +5,8 @@
 #include "file_handler.c"
 
 #define INSERT_COMMAND "insert into"
-
+#define MAX_WORDS 10  // Número máximo de palavras esperadas
+#define MAX_WORD_LENGTH 50  // Tamanho máximo de cada palavra
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -58,9 +59,50 @@ char *check_table(const char *statement, COMMAND_TO_DO command) {
     return NULL;
 }
 
+// Função para extrair palavras dentro de parênteses
+int extract_words(const char *quote, char words[MAX_WORDS][MAX_WORD_LENGTH]) {
+    int i = 0, j = 0, k = 0;
+    int is_inside_parenthesis = 0;  // Flag para indicar se estamos dentro dos parênteses
+
+    // Percorre a frase
+    while (quote[i] != '\0') {
+        if (quote[i] == '(') {
+            is_inside_parenthesis = 1;  // Entrou nos parênteses
+            i++;
+        } else if (quote[i] == ')') {
+            is_inside_parenthesis = 0;  // Saiu dos parênteses
+            i++;
+        } else if (is_inside_parenthesis) {
+            if (quote[i] == ',') {
+                words[k][j] = '\0';  // Finaliza a palavra atual
+                k++;  // Próxima palavra
+                j = 0;  // Reinicia o índice da palavra
+                i++;
+            } else if (quote[i] != ' ') {  // Ignora espaços
+                words[k][j] = quote[i];  // Adiciona caractere à palavra
+                j++;
+                i++;
+            } else {
+                i++;  // Ignora espaços
+            }
+        } else {
+            i++;  // Avança na frase
+        }
+    }
+
+    words[k][j] = '\0';  // Finaliza a última palavra
+    return k + 1;  // Retorna o número de palavras encontradas
+}
+
 void getFields(char *statement, COMMAND_TO_DO command, char *table) {
+    char words[MAX_WORDS][MAX_WORD_LENGTH];
+    int num_words = extract_words(statement, words);
+    printf("Palavras encontradas:\n");
+    for (int i = 0; i < num_words; i++) {
+        printf("%s\n", words[i]);
+    }
+
     if(command == DO_INSERT && !strcmp(table, "pet")) {
-        printf("Voce ta querendo inserir na tabela pet!");
     }
 
     if(command == DO_INSERT && !strcmp(table, "pet_type")) {
@@ -129,7 +171,7 @@ int main() {
 
     command *lista = NULL;
     printf("Testando comando insert: \n");
-    add_command(&lista, "insert into dhfjahfk(name,phone,address,birth)");
+    add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Mario', 1)");
 
 //    client *lista_deserializada = deserialize("client_list.bin");
 //    show_list(lista_deserializada);
