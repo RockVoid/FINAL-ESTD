@@ -109,9 +109,20 @@ int extract_words(const char *quote, const char *keyword, char words[MAX_WORDS][
 
 int get_fields(char *statement, COMMAND_TO_DO command, char *table) {
     char finded_fields[MAX_WORDS][MAX_WORD_LENGTH];
-    int num_fields = extract_words(statement, table, finded_fields);
+    int num_fields = 0;
+    char fields[50];
 
-    for (int i = 0; i < num_fields; i++) {
+    strncpy(fields, statement + 11, 37);
+
+    switch(command) {
+        case DO_INSERT:
+            num_fields = extract_words(fields, table, finded_fields);
+            break;
+        default:
+            return num_fields;
+    }
+
+    for (int i = 0; i < 3; i++) {
         if(strcmp(finded_fields[i], pet_table_fields[i]) != 0) {
             printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
             return 0;
@@ -119,8 +130,6 @@ int get_fields(char *statement, COMMAND_TO_DO command, char *table) {
     }
     return 1;
 }
-
-
 
 void add_command(command **fila_de_comandos, char *statement) {
 
@@ -135,7 +144,7 @@ void add_command(command **fila_de_comandos, char *statement) {
                 return;
             };
             get_fields(statement, DO_INSERT, table);
-            free(table);
+            printf("Comando no formato certo");
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
@@ -179,7 +188,7 @@ int main() {
 
     command *lista = NULL;
     printf("Testando comando insert: \n");
-    add_command(&lista, "insert into pet(code_client, jhkhkj, pet_type_code)");
+    add_command(&lista, "insert into pet(code_client, name, pet_type_code,) values(1, 'Roque', 7)");
 
 //    client *lista_deserializada = deserialize("client_list.bin");
 //    show_list(lista_deserializada);
