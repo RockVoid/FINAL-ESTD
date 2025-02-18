@@ -5,7 +5,7 @@
 #include "file_handler.c"
 
 #define INSERT_COMMAND "insert into"
-#define MAX_WORDS 10  // Número máximo de palavras esperadas
+#define MAX_WORDS 4  // Número máximo de palavras esperadas
 #define MAX_WORD_LENGTH 50  // Tamanho máximo de cada palavra
 
 char *pet_table_fields[3] = {"code_client", "name", "pet_type_code"};
@@ -107,12 +107,14 @@ int extract_words(const char *quote, const char *keyword, char words[MAX_WORDS][
     return k + 1;  // Num palavras
 }
 
-int get_fields(char *statement, COMMAND_TO_DO command, char *table) {
+int verify_fields(char *statement, COMMAND_TO_DO command, char *table) {
     char finded_fields[MAX_WORDS][MAX_WORD_LENGTH];
     int num_fields = 0;
     char fields[50];
+    int fields_of_table_start = 11;
+    int fields_of_table_ends = 37;
 
-    strncpy(fields, statement + 11, 37);
+    strncpy(fields, statement + fields_of_table_start, fields_of_table_ends);
 
     switch(command) {
         case DO_INSERT:
@@ -131,6 +133,29 @@ int get_fields(char *statement, COMMAND_TO_DO command, char *table) {
     return 1;
 }
 
+int get_values(char *statement, COMMAND_TO_DO command) {
+    char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
+    int num_values = 0;
+    int values_of_table_start = 50;
+    int values_of_table_end = 55;
+    char result[50];
+
+    if(command == DO_INSERT) {
+        strncpy(result, statement + values_of_table_start, values_of_table_end);
+        num_values = extract_words(result, "values", finded_values);
+
+        if(!num_values) return 0;
+    }
+
+    // Mostrando dados inseridos pelo usuario, pegar esses dados e colocar nos campos de uma nova struct
+    for (int i = 0; i < 3; i++) {
+        printf("Data:\n");
+        printf("%s\n", finded_values[i]);
+    }
+
+    return num_values;
+}
+
 void add_command(command **fila_de_comandos, char *statement) {
 
     char *table = NULL;
@@ -143,8 +168,9 @@ void add_command(command **fila_de_comandos, char *statement) {
                 free(table);
                 return;
             };
-            get_fields(statement, DO_INSERT, table);
-            printf("Comando no formato certo");
+            verify_fields(statement, DO_INSERT, table);
+            get_values(statement, DO_INSERT); // Get values and set operation
+
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
@@ -188,7 +214,7 @@ int main() {
 
     command *lista = NULL;
     printf("Testando comando insert: \n");
-    add_command(&lista, "insert into pet(code_client, name, pet_type_code,) values(1, 'Roque', 7)");
+    add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
 
 //    client *lista_deserializada = deserialize("client_list.bin");
 //    show_list(lista_deserializada);
