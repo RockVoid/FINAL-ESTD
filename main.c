@@ -12,6 +12,8 @@ char *pet_table_fields[3] = {"code_client", "name", "pet_type_code"};
 char *pet_type_table_fields[2] = {"code", "desc"};
 char *client_table_fields[5] = {"code", "name", "phone", "birth", "address"};
 
+char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
+
 COMMAND_TO_DO check_syntax(char *statement) {
 
     if(!strncmp(statement, INSERT_COMMAND, 6)) {
@@ -133,8 +135,6 @@ int verify_fields(char *statement, COMMAND_TO_DO command, char *table) {
     return 1;
 }
 
-char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
-
 int get_values(char *statement, COMMAND_TO_DO command) {
     int num_values = 0;
     int values_of_table_start = 50;
@@ -172,11 +172,27 @@ void add_command(command **fila_de_comandos, char *statement) {
             verify_fields(statement, DO_INSERT, table);
             get_values(statement, DO_INSERT); // Get values and set operation
             do_insert(table);
+            free(table);
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
         break;
     }
+}
+
+pet *create_pet(int code, char *pet_type_code, const char *name, const char *code_client) {
+    pet *new_pet = malloc(sizeof(pet));
+    new_pet->next = NULL;
+
+    // Deverá incrementar de acordo com o tamanho da lista de pet's
+    new_pet->code = 1;
+    // Verificar se existe algum cliente com code_client
+    strncpy(new_pet->code_client, code_client, 2);
+    strncpy(new_pet->name, name, 40);
+    // Verificar se existe algum codigo de pet com esse numero
+    strncpy(new_pet->pet_type_code, pet_type_code, 2);
+
+    return new_pet;
 }
 
 client *create_client(const char *name,const char *address, const int code, const char* phone, const char* birth) {
@@ -193,9 +209,11 @@ client *create_client(const char *name,const char *address, const int code, cons
     return new_client;
 }
 
+void add_pet() {}
+
 void add_client(client **list, const char* name, const char* address, const char* phone, const char* birth, const int code) {
     client* new_client = create_client(name, address, code, phone, birth);
-    new_client->next = (struct client*) *list;
+    new_client->next = *list;
     *list = new_client;
 }
 
