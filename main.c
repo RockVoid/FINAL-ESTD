@@ -151,6 +151,10 @@ int get_values(char *statement, COMMAND_TO_DO command) {
     return num_values;
 }
 
+void do_insert(char *table) {
+
+}
+
 void add_command(command **fila_de_comandos, char *statement) {
 
     char *table = NULL;
@@ -165,10 +169,10 @@ void add_command(command **fila_de_comandos, char *statement) {
             };
             verify_fields(statement, DO_INSERT, table);
             get_values(statement, DO_INSERT); // Get values and set operation
+            do_insert(table);
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
-
         break;
     }
 }
