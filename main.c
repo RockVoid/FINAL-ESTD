@@ -9,8 +9,8 @@
 #define MAX_WORD_LENGTH 50  // Tamanho máximo de cada palavra
 
 char *pet_table_fields[3] = {"code_client", "name", "pet_type_code"};
-char *pet_type_table_fields[3] = {"", "", ""};
-char *client_table_fields[3] = {"", "", ""};
+char *pet_type_table_fields[2] = {"code", "desc"};
+char *client_table_fields[5] = {"code", "name", "phone", "birth", "address"};
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -133,8 +133,9 @@ int verify_fields(char *statement, COMMAND_TO_DO command, char *table) {
     return 1;
 }
 
+char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
+
 int get_values(char *statement, COMMAND_TO_DO command) {
-    char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
     int num_values = 0;
     int values_of_table_start = 50;
     int values_of_table_end = 55;
@@ -145,12 +146,6 @@ int get_values(char *statement, COMMAND_TO_DO command) {
         num_values = extract_words(result, "values", finded_values);
 
         if(!num_values) return 0;
-    }
-
-    // Mostrando dados inseridos pelo usuario, pegar esses dados e colocar nos campos de uma nova struct
-    for (int i = 0; i < 3; i++) {
-        printf("Data:\n");
-        printf("%s\n", finded_values[i]);
     }
 
     return num_values;
@@ -170,10 +165,10 @@ void add_command(command **fila_de_comandos, char *statement) {
             };
             verify_fields(statement, DO_INSERT, table);
             get_values(statement, DO_INSERT); // Get values and set operation
-
         break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
+
         break;
     }
 }
