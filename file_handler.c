@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include "struct_data.c"
 
-void serialize(client *lista, const char* filename) {
+void serialize_client(client *lista, const char* filename) {
     FILE* file = fopen(filename, "wb");
     if(!file) {
         printf("Não foi possivel abrir o arquivo!");
@@ -9,20 +9,64 @@ void serialize(client *lista, const char* filename) {
     }
 
     client *current = lista;
-    while(current) {
-        fwrite(current->name, sizeof(char), 50, file);
-        fwrite(current->address, sizeof(char), 100, file);
-        fwrite(&(current->code), sizeof(int), 1, file);
-        fwrite(current->birth, sizeof(char), 20, file);
-        fwrite(current->phone, sizeof(char), 20, file);
-        current = current->next;
-    }
+
+        while(current) {
+            fwrite(current->name, sizeof(char), 50, file);
+            fwrite(current->address, sizeof(char), 100, file);
+            fwrite(&(current->code), sizeof(int), 1, file);
+            fwrite(current->birth, sizeof(char), 20, file);
+            fwrite(current->phone, sizeof(char), 20, file);
+            current = current->next;
+        }
+
 
     fclose(file);
     printf("Linked list saved to %s\n", filename);
 }
 
-client* deserialize(const char* filename) {
+void serialize_pet_type(pet_type *lista, const char* filename) {
+    FILE* file = fopen(filename, "wb");
+    if(!file) {
+        printf("Não foi possivel abrir o arquivo!");
+        return;
+    }
+
+    pet_type *current = lista;
+
+        while(current) {
+            fwrite(current->desc, sizeof(char), 100, file);
+            fwrite(&(current->code), sizeof(int), 1, file);
+            current = current->next;
+        }
+
+
+    fclose(file);
+    printf("Linked list saved to %s\n", filename);
+}
+
+void serialize_pet(pet *lista, const char* filename) {
+    FILE* file = fopen(filename, "wb");
+    if(!file) {
+        printf("Não foi possivel abrir o arquivo!");
+        return;
+    }
+
+    pet *current = lista;
+
+        while(current) {
+            fwrite(current->name, sizeof(char), 40, file);
+            fwrite(&(current->code), sizeof(int), 1, file);
+            fwrite(&(current->code_client), sizeof(int), 1, file);
+            fwrite(current->pet_type_code, sizeof(char*), 1, file);
+            current = current->next;
+        }
+
+
+    fclose(file);
+    printf("Linked list saved to %s\n", filename);
+}
+
+client* deserialize_client(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
         printf("Failed to open file!");

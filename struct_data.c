@@ -11,16 +11,18 @@ typedef struct client{
     struct client *next;
 } client;
 
-typedef struct {
+typedef struct pet_type{
     int code;
     char desc[100];
+    struct pet_type *next;
 } pet_type;
 
-typedef struct {
+typedef struct pet{
     int code;
     int *code_client;
     char name[40];
     char *pet_type_code;
+    struct pet *next;
 } pet;
 
 typedef struct {
