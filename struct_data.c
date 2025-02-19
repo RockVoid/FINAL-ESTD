@@ -19,9 +19,9 @@ typedef struct pet_type{
 
 typedef struct pet{
     int code;
-    int *code_client;
+    char pet_type_code[2];
     char name[40];
-    char *pet_type_code;
+    char *code_client[2];
     struct pet *next;
 } pet;
 

@@ -152,7 +152,9 @@ int get_values(char *statement, COMMAND_TO_DO command) {
 }
 
 void do_insert(char *table) {
-
+    if(!strcmp(table, "pet")) {
+        printf("INSERT EM PET");
+    }
 }
 
 void add_command(command **fila_de_comandos, char *statement) {
