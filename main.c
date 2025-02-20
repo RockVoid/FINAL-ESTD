@@ -13,6 +13,7 @@ char *pet_type_table_fields[2] = {"code", "desc"};
 char *client_table_fields[5] = {"code", "name", "phone", "birth", "address"};
 
 char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
+char table[8];
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -39,30 +40,35 @@ char* sliceString(const char* str, int start, int end) {
     return slicedStr;
 }
 
-char *check_table(const char *statement, COMMAND_TO_DO command) {
-    char *table = NULL;
+void check_table(const char *statement, COMMAND_TO_DO command) {
+    int fields_of_table_start = 0;
+    int fields_of_table_ends = 0;
+
     if(command == DO_INSERT) {
-        table = sliceString(statement, 12, 16);
+        fields_of_table_start = 12;
+        fields_of_table_ends = 4;
+
+        strncpy(table, statement + fields_of_table_start, fields_of_table_ends);
         if(!strcmp(table, "pet(")) {
-            free(table);
             strcpy(table, "pet");
-            return table;
+            return;
         }
-        free(table);
 
-        table = sliceString(statement, 12, 20);
+        fields_of_table_start = 12;
+        fields_of_table_ends = 8;
+
+        strncpy(table, statement + fields_of_table_start, fields_of_table_ends);
         if(!strcmp(table, "pet_type")) {
-            return table;
+            return;
         }
-        free(table);
 
-        table = sliceString(statement, 12, 18);
+        fields_of_table_start = 12;
+        fields_of_table_ends = 6;
+        strncpy(table, statement + fields_of_table_start, fields_of_table_ends);
         if(!strcmp(table, "client")) {
-            return table;
+            return;
         }
     }
-    free(table);
-    return NULL;
 }
 
 int extract_words(const char *quote, const char *keyword, char words[MAX_WORDS][MAX_WORD_LENGTH]) {
@@ -193,11 +199,9 @@ void do_insert(char *table) {
 
 void add_command(command **fila_de_comandos, char *statement) {
 
-    char *table = NULL;
-
     switch(check_syntax(statement)) {
         case DO_INSERT:
-            table = check_table(statement, DO_INSERT);
+            check_table(statement, DO_INSERT);
             if(!table) {
                 printf("Tabela nao reconhecida");
                 free(table);
@@ -210,7 +214,6 @@ void add_command(command **fila_de_comandos, char *statement) {
             for(int i = 0; i < 3;i++) {
                 printf("%s", finded_values[i]);
             }
-            free(table);
             break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
