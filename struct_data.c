@@ -17,11 +17,11 @@ typedef struct pet_type{
     struct pet_type *next;
 } pet_type;
 
-typedef struct pet{
+typedef struct pet {
     int code;
     char pet_type_code[2];
     char name[40];
-    char *code_client[2];
+    char code_client[2];
     struct pet *next;
 } pet;
 

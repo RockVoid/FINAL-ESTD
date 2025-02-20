@@ -151,50 +151,6 @@ int get_values(char *statement, COMMAND_TO_DO command) {
     return num_values;
 }
 
-void do_insert(char *table) {
-    if(!strcmp(table, "pet")) {
-        printf("INSERT EM PET");
-    }
-}
-
-void add_command(command **fila_de_comandos, char *statement) {
-
-    char *table = NULL;
-
-    switch(check_syntax(statement)) {
-        case DO_INSERT:
-            table = check_table(statement, DO_INSERT);
-            if(!table) {
-                printf("Tabela nao reconhecida");
-                free(table);
-                return;
-            };
-            verify_fields(statement, DO_INSERT, table);
-            get_values(statement, DO_INSERT); // Get values and set operation
-            do_insert(table);
-            free(table);
-        break;
-        case COMMAND_NOT_RECOGNIZED:
-            printf("Comando nao reconhecido!");
-        break;
-    }
-}
-
-pet *create_pet(int code, char *pet_type_code, const char *name, const char *code_client) {
-    pet *new_pet = malloc(sizeof(pet));
-    new_pet->next = NULL;
-
-    // Deverá incrementar de acordo com o tamanho da lista de pet's
-    new_pet->code = 1;
-    // Verificar se existe algum cliente com code_client
-    strncpy(new_pet->code_client, code_client, 2);
-    strncpy(new_pet->name, name, 40);
-    // Verificar se existe algum codigo de pet com esse numero
-    strncpy(new_pet->pet_type_code, pet_type_code, 2);
-
-    return new_pet;
-}
-
 client *create_client(const char *name,const char *address, const int code, const char* phone, const char* birth) {
     client *new_client = malloc(sizeof(client));
 
@@ -208,8 +164,6 @@ client *create_client(const char *name,const char *address, const int code, cons
 
     return new_client;
 }
-
-void add_pet() {}
 
 void add_client(client **list, const char* name, const char* address, const char* phone, const char* birth, const int code) {
     client* new_client = create_client(name, address, code, phone, birth);
@@ -229,9 +183,45 @@ void show_list(client* head) {
     }
 }
 
+void do_insert(char *table) {
+    if(!strcmp(table, "pet")) {
+        printf("INSERT EM PET");
+        pet *pet_list = NULL;
+
+    }
+}
+
+void add_command(command **fila_de_comandos, char *statement) {
+
+    char *table = NULL;
+
+    switch(check_syntax(statement)) {
+        case DO_INSERT:
+            table = check_table(statement, DO_INSERT);
+            if(!table) {
+                printf("Tabela nao reconhecida");
+                free(table);
+                return;
+            };
+            verify_fields(statement, DO_INSERT, table);
+            get_values(statement, DO_INSERT); // Get values and set operation
+            do_insert(table);
+            printf("Data: \n");
+            for(int i = 0; i < 3;i++) {
+                printf("%s", finded_values[i]);
+            }
+            free(table);
+            break;
+        case COMMAND_NOT_RECOGNIZED:
+            printf("Comando nao reconhecido!");
+        break;
+    }
+}
+
 int main() {
 
     command *lista = NULL;
+
     printf("Testando comando insert: \n");
     add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
 
