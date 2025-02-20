@@ -189,11 +189,9 @@ void show_list(client* head) {
     }
 }
 
-void do_insert(char *table) {
+void do_insert() {
     if(!strcmp(table, "pet")) {
         printf("INSERT EM PET");
-        pet *pet_list = NULL;
-
     }
 }
 
@@ -209,7 +207,7 @@ void add_command(command **fila_de_comandos, char *statement) {
             };
             verify_fields(statement, DO_INSERT, table);
             get_values(statement, DO_INSERT); // Get values and set operation
-            do_insert(table);
+            do_insert();
             printf("Data: \n");
             for(int i = 0; i < 3;i++) {
                 printf("%s", finded_values[i]);
