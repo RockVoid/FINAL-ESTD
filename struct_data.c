@@ -18,10 +18,10 @@ typedef struct pet_type{
 } pet_type;
 
 typedef struct pet {
-    int code;
-    char pet_type_code[2];
+    char code[3];
+    char pet_type_code[3];
     char name[40];
-    char code_client[2];
+    char code_client[3];
     struct pet *next;
 } pet;
 

@@ -177,21 +177,45 @@ void add_client(client **list, const char* name, const char* address, const char
     *list = new_client;
 }
 
-void show_list(client* head) {
+pet* create_pet() {
+    pet *new_pet = malloc(sizeof(pet));
+
+
+    strcpy(new_pet->code_client, "01");
+    strcpy(new_pet->code, "03");
+    strcpy(new_pet->name, "Teste");
+    strcpy(new_pet->pet_type_code, "02");
+
+    new_pet->next = NULL;
+
+    return new_pet;
+}
+
+void add_pet(pet **pet_list) {
+    pet *new_pet = create_pet();
+    new_pet->next = *pet_list;
+    *pet_list = new_pet;
+}
+
+void show_list(pet* head) {
     if (!head) {
         printf("A lista esta vazia!\n");
         return;
     }
-    client* aux = head;
+    pet* aux = head;
     while (aux) {
-        printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
-        aux = (client *) aux->next;
+        printf("\nName: %s\nCode_pet: %s\nDono: %s", aux->name, aux->pet_type_code, aux->code_client);
+        //printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
+        aux = aux->next;
     }
 }
 
 void do_insert() {
     if(!strcmp(table, "pet")) {
         printf("INSERT EM PET");
+        pet *list = NULL;
+        add_pet(&list);
+        show_list(list);
     }
 }
 
@@ -208,10 +232,6 @@ void add_command(command **fila_de_comandos, char *statement) {
             verify_fields(statement, DO_INSERT, table);
             get_values(statement, DO_INSERT); // Get values and set operation
             do_insert();
-            printf("Data: \n");
-            for(int i = 0; i < 3;i++) {
-                printf("%s", finded_values[i]);
-            }
             break;
         case COMMAND_NOT_RECOGNIZED:
             printf("Comando nao reconhecido!");
