@@ -24,22 +24,6 @@ COMMAND_TO_DO check_syntax(char *statement) {
     return COMMAND_NOT_RECOGNIZED;
 };
 
-char* sliceString(const char* str, int start, int end) {
-    int length = end - start;
-
-    char* slicedStr = malloc((length + 1) * sizeof(char));
-    if (slicedStr == NULL) {
-        fprintf(stderr, "Não foi possivel alocar memoria.\n");
-        return NULL;
-    }
-
-    strncpy(slicedStr, str + start, length);
-
-    slicedStr[length] = '\0';
-
-    return slicedStr;
-}
-
 void check_table(const char *statement, COMMAND_TO_DO command) {
     int fields_of_table_start = 0;
     int fields_of_table_ends = 0;
@@ -177,7 +161,6 @@ void add_client(client **list, const char* name, const char* address, const char
     *list = new_client;
 }
 
-// Function to count how many times the program is executed
 int count_executions() {
     int count = 0;
 
@@ -222,7 +205,7 @@ pet* create_pet() {
     pet *new_pet = malloc(sizeof(pet));
 
     int code_of_pet = count_executions();
-    // Essa IDE reclama mais que minha namorada :P
+    // Essa IDE reclama mais que minhas kenga :P
     char code = code_of_pet + '0';
 
     strcpy(new_pet->code_client, finded_values[0]);
@@ -287,8 +270,6 @@ void add_command(char *statement) {
 int main() {
 
     printf("TEST DESERIALIZE PET_LIST: \n");
-    add_command("insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
-    add_command("insert into pet(code_client, name, pet_type_code) values(2, 'Pedro', 4)");
 
     pet *lista_deserializada = deserialize_pet("pet_list.bin");
     show_list(lista_deserializada);
