@@ -177,14 +177,58 @@ void add_client(client **list, const char* name, const char* address, const char
     *list = new_client;
 }
 
+// Function to count how many times the program is executed
+int count_executions() {
+    int count = 0;
+
+    // Open the binary file for reading and writing
+    FILE *file = fopen("execution_count.bin", "rb+");
+
+    // If the file doesn't exist, create it and initialize the count to 0
+    if (file == NULL) {
+        file = fopen("execution_count.bin", "wb");
+        if (file == NULL) {
+            perror("Failed to create file");
+            return -1;
+        }
+        fwrite(&count, sizeof(int), 1, file);
+        fclose(file);
+        file = fopen("execution_count.bin", "rb+");
+        if (file == NULL) {
+            perror("Failed to open file");
+            return -1;
+        }
+    }
+
+    // Read the current count from the file
+    fread(&count, sizeof(int), 1, file);
+
+    // Increment the count
+    count++;
+
+    // Move the file pointer to the beginning of the file
+    rewind(file);
+
+    // Write the updated count back to the file
+    fwrite(&count, sizeof(int), 1, file);
+
+    // Close the file
+    fclose(file);
+
+    return count;
+}
+
 pet* create_pet() {
     pet *new_pet = malloc(sizeof(pet));
 
+    int code_of_pet = count_executions();
+    // Essa IDE reclama mais que minha namorada :P
+    char code = code_of_pet + '0';
 
-    strcpy(new_pet->code_client, "01");
-    strcpy(new_pet->code, "03");
-    strcpy(new_pet->name, "Teste");
-    strcpy(new_pet->pet_type_code, "02");
+    strcpy(new_pet->code_client, finded_values[0]);
+    strcpy(new_pet->code, &code);
+    strcpy(new_pet->name, finded_values[1]);
+    strcpy(new_pet->pet_type_code, finded_values[2]);
 
     new_pet->next = NULL;
 
@@ -215,13 +259,12 @@ void do_insert() {
     if(!strcmp(table, "pet")) {
         printf("INSERT EM PET");
         pet *list = deserialize_pet("pet_list.bin");
-        printf("Nulo");
         add_pet(&list);
         serialize_pet(list, "pet_list.bin");
     }
 }
 
-void add_command(command **fila_de_comandos, char *statement) {
+void add_command(char *statement) {
 
     switch(check_syntax(statement)) {
         case DO_INSERT:
@@ -243,10 +286,9 @@ void add_command(command **fila_de_comandos, char *statement) {
 
 int main() {
 
-    command *lista = NULL;
-
     printf("TEST DESERIALIZE PET_LIST: \n");
-//    add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
+    add_command("insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, 'Pedro', 4)");
 
     pet *lista_deserializada = deserialize_pet("pet_list.bin");
     show_list(lista_deserializada);
