@@ -211,11 +211,13 @@ void show_list(pet* head) {
 }
 
 void do_insert() {
+
     if(!strcmp(table, "pet")) {
         printf("INSERT EM PET");
-        pet *list = NULL;
+        pet *list = deserialize_pet("pet_list.bin");
+        printf("Nulo");
         add_pet(&list);
-        show_list(list);
+        serialize_pet(list, "pet_list.bin");
     }
 }
 
@@ -243,12 +245,12 @@ int main() {
 
     command *lista = NULL;
 
-    printf("Testando comando insert: \n");
-    add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
+    printf("TEST DESERIALIZE PET_LIST: \n");
+//    add_command(&lista, "insert into pet(code_client, name, pet_type_code) values(1, 'Roque', 7)");
 
-//    client *lista_deserializada = deserialize("client_list.bin");
-//    show_list(lista_deserializada);
+    pet *lista_deserializada = deserialize_pet("pet_list.bin");
+    show_list(lista_deserializada);
 
-//    free(lista_deserializada);
+    free(lista_deserializada);
     return 0;
 }

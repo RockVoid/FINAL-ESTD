@@ -54,10 +54,10 @@ void serialize_pet(pet *lista, const char* filename) {
     pet *current = lista;
 
         while(current) {
+            fwrite(current->code, sizeof(char), 3, file);
+            fwrite(current->pet_type_code, sizeof(char), 3, file);
             fwrite(current->name, sizeof(char), 40, file);
-            fwrite(&(current->code), sizeof(int), 1, file);
-            fwrite(&(current->code_client), sizeof(int), 1, file);
-            fwrite(current->pet_type_code, sizeof(char*), 1, file);
+            fwrite(current->code_client, sizeof(char), 3, file);
             current = current->next;
         }
 
@@ -81,12 +81,12 @@ pet* deserialize_pet(const char* filename) {
         pet *new_pet = malloc(sizeof(pet));
         new_pet->next = NULL;
 
-        size_t new_pet_code = fread(&(new_pet->code), sizeof(int), 1, file);
-        size_t new_pet_type_code = fread(new_pet->pet_type_code, sizeof(char), 2, file);
+        size_t new_pet_code = fread(&(new_pet->code), sizeof(char), 3, file);
+        size_t new_pet_type_code = fread(new_pet->pet_type_code, sizeof(char), 3, file);
         size_t new_pet_name = fread(new_pet->name, sizeof(char), 40, file);
-        size_t new_pet_code_client = fread(new_pet->code_client, sizeof(char), 2, file);
+        size_t new_pet_code_client = fread(new_pet->code_client, sizeof(char), 3, file);
 
-        if (new_pet_code != 1 || new_pet_type_code != 2 || new_pet_name != 40 || new_pet_code_client != 2) {
+        if (new_pet_code != 3 || new_pet_type_code != 3 || new_pet_name != 40 || new_pet_code_client != 3) {
             free(new_pet);
             break;
         }
