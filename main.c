@@ -9,7 +9,7 @@
 #define MAX_WORD_LENGTH 50  // Tamanho máximo de cada palavra
 
 char *pet_table_fields[3] = {"code_client", "name", "pet_type_code"};
-char *pet_type_table_fields[2] = {"code", "desc"};
+char *pet_type_table_fields[2] = {"desc"};
 char *client_table_fields[4] = {"name", "phone", "birth", "address"};
 
 char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
@@ -201,6 +201,11 @@ int get_values(char *statement, COMMAND_TO_DO command) {
         values_of_table_end = 80;
     }
 
+    if(!strcmp(table, "pet_type")) {
+        values_of_table_start = 27;
+        values_of_table_end = 40;
+    }
+
     if(command == DO_INSERT) {
         strncpy(result, statement + values_of_table_start, values_of_table_end);
         num_values = extract_words(result, "values", finded_values);
@@ -332,6 +337,15 @@ void do_insert() {
         add_client(&list);
         serialize_client(list, "client_table.bin");
     }
+
+    if(!strcmp(table, "pet_type")) {
+        printf("\nINSERT EM PET TYPE\n");
+        /*
+         *pet_type *list = deserialize_pet_type("pet_type_table.bin");
+         add_pet_type(&list);
+         serialize_pet_type(list, "pet_type_table.bin");
+        */
+    }
 }
 
 void add_command(char *statement) {
@@ -357,7 +371,7 @@ void add_command(char *statement) {
 
 int main() {
     // TESTANDO INSERT CLIENT TABLE
-
+/*
     add_command("insert into client(name, phone, birth, address) values(Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
     client *list = NULL;
     list = deserialize_client("client_table.bin");
@@ -371,7 +385,7 @@ int main() {
     pet *pet_list = NULL;
     pet_list = deserialize_pet("pet_table.bin");
     show_pet_list(pet_list);
-
-
+*/
+    add_command("insert into pet_type(desc) values(bulldog);");
     return 0;
 }
