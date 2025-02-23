@@ -13,7 +13,7 @@ void serialize_client(client *lista, const char* filename) {
         while(current) {
             fwrite(current->name, sizeof(char), 50, file);
             fwrite(current->address, sizeof(char), 100, file);
-            fwrite(current->code, sizeof(char), 3, file);
+            fwrite(&(current->code), sizeof(int), 1, file);
             fwrite(current->birth, sizeof(char), 20, file);
             fwrite(current->phone, sizeof(char), 20, file);
             current = current->next;
@@ -122,12 +122,12 @@ client* deserialize_client(const char* filename) {
 
         size_t name_readed = fread(new_client->name, sizeof(char), 50, file);
         size_t address_readed = fread(new_client->address, sizeof(char), 100, file);
-        size_t code_readed = fread(new_client->code, sizeof(char), 3, file);
+        size_t code_readed = fread(&(new_client->code), sizeof(int), 1, file);
         size_t birth_readed = fread(new_client->birth, sizeof(char), 20, file);
         size_t phone_readed = fread(new_client->phone, sizeof(char), 20, file);
 
         // Eu queria melhorar esse if :P
-        if (name_readed != 50 || address_readed != 100 || code_readed != 3 || birth_readed != 20 || phone_readed != 20) {
+        if (name_readed != 50 || address_readed != 100 || code_readed != 1 || birth_readed != 20 || phone_readed != 20) {
             free(new_client);
             break;
         }

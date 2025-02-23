@@ -10,7 +10,7 @@
 
 char *pet_table_fields[3] = {"code_client", "name", "pet_type_code"};
 char *pet_type_table_fields[2] = {"code", "desc"};
-char *client_table_fields[5] = {"code", "name", "phone", "birth", "address"};
+char *client_table_fields[4] = {"name", "phone", "birth", "address"};
 
 char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
 char table[9];
@@ -106,29 +106,36 @@ int extract_words(const char *quote, const char *keyword, char words[MAX_WORDS][
     return k + 1;  // Num palavras
 }
 
-int verify_fields(char *statement, COMMAND_TO_DO command, char *table) {
+int verify_fields(char *statement, COMMAND_TO_DO command) {
     char finded_fields[MAX_WORDS][MAX_WORD_LENGTH];
     int num_fields = 0;
     char fields[50];
-    int fields_of_table_start = 11;
-    int fields_of_table_ends = 37;
+    int fields_of_table_start = 0;
+    int fields_of_table_ends = 0;
 
-    strncpy(fields, statement + fields_of_table_start, fields_of_table_ends);
 
-    switch(command) {
-        case DO_INSERT:
-            num_fields = extract_words(fields, table, finded_fields);
+    if(!strcmp(table, "pet")) {
+        fields_of_table_start = 11;
+        fields_of_table_ends = 37;
+
+        strncpy(fields, statement + fields_of_table_start, fields_of_table_ends);
+
+        switch(command) {
+            case DO_INSERT:
+                num_fields = extract_words(fields, table, finded_fields);
             break;
-        default:
-            return num_fields;
-    }
+            default:
+                return num_fields;
+        }
 
-    for (int i = 0; i < 3; i++) {
-        if(strcmp(finded_fields[i], pet_table_fields[i]) != 0) {
-            printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
-            return 0;
+        for (int i = 0; i < 3; i++) {
+            if(strcmp(finded_fields[i], pet_table_fields[i]) != 0) {
+                printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
+                return 0;
+            }
         }
     }
+
     return 1;
 }
 
@@ -186,17 +193,31 @@ client *create_client() {
 
     int code_of_client = count_ids_of_table("client_table.bin");
     // Essa IDE reclama mais que minhas kenga :P
-    char code = code_of_client + '0';
 
     strcpy(new_client->name, finded_values[0]);
     strcpy(new_client->address, finded_values[1]);
     strcpy(new_client->phone, finded_values[2]);
     strcpy(new_client->birth,  finded_values[3]);
-    strcpy(new_client->code, &code);
+    new_client->code = code_of_client;
 
     new_client->next = NULL;
 
     return new_client;
+}
+
+void show_client_list(client* head) {
+    if (!head) {
+        printf("A lista esta vazia!\n");
+        return;
+    }
+    client* aux = head;
+    while (aux) {
+        printf("\n========================================================\n");
+        printf("\nCode: %d\nName: %s\nAddress: %s\nPhone: %s\nBirth: %s",
+            aux->code, aux->name, aux->address, aux->phone, aux->birth);
+        //printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
+        aux = aux->next;
+    }
 }
 
 void add_client(client **list) {
@@ -265,7 +286,7 @@ void add_command(char *statement) {
                 return;
             };
 
-            verify_fields(statement, DO_INSERT, table);
+            verify_fields(statement, DO_INSERT);
             get_values(statement, DO_INSERT);
             do_insert();
             break;
@@ -277,10 +298,18 @@ void add_command(char *statement) {
 
 int main() {
 
-    add_command("insert into pet(code_client, name, pet_type_code) values(2, 'Jack', 3)");
-    pet *list = NULL;
-    list = deserialize_pet("pet_table.bin");
-    show_pet_list(list);
-    return 0;
+    // TESTANDO INSERT CLIENT TABLE
 
+    add_command("insert into client(name, phone, birth, address) values (Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
+    client *list = NULL;
+    list = deserialize_client("client_table.bin");
+    show_client_list(list);
+
+    /*
+        add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+        pet *list = NULL;
+        list = deserialize_pet("pet_table.bin");
+        show_pet_list(list);
+    */
+    return 0;
 }

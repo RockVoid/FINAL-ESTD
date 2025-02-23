@@ -3,7 +3,7 @@
 //
 
 typedef struct client{
-    char code[3];
+    int code;
     char name[50];
     char phone[20];
     char birth[20];
