@@ -3,7 +3,7 @@
 //
 
 typedef struct client{
-    int code;
+    char code[3];
     char name[50];
     char phone[20];
     char birth[20];
@@ -25,7 +25,7 @@ typedef struct pet {
     struct pet *next;
 } pet;
 
-typedef struct {
+typedef struct command {
     char desc[200];
     struct comando *next;
 } command;

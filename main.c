@@ -13,7 +13,7 @@ char *pet_type_table_fields[2] = {"code", "desc"};
 char *client_table_fields[5] = {"code", "name", "phone", "birth", "address"};
 
 char finded_values[MAX_WORDS][MAX_WORD_LENGTH];
-char table[8];
+char table[9];
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
@@ -22,6 +22,12 @@ COMMAND_TO_DO check_syntax(char *statement) {
     }
 
     return COMMAND_NOT_RECOGNIZED;
+};
+
+void clear_characters_of_table() {
+    for(int i = 0; i < sizeof(table); i++) {
+        table[i] = '\0';
+    }
 };
 
 void check_table(const char *statement, COMMAND_TO_DO command) {
@@ -38,7 +44,6 @@ void check_table(const char *statement, COMMAND_TO_DO command) {
             return;
         }
 
-        fields_of_table_start = 12;
         fields_of_table_ends = 8;
 
         strncpy(table, statement + fields_of_table_start, fields_of_table_ends);
@@ -46,11 +51,13 @@ void check_table(const char *statement, COMMAND_TO_DO command) {
             return;
         }
 
-        fields_of_table_start = 12;
-        fields_of_table_ends = 6;
-        strncpy(table, statement + fields_of_table_start, fields_of_table_ends);
+       // Gambs
+        clear_characters_of_table();
+        strncpy(table, (statement + fields_of_table_start), 6);
         if(!strcmp(table, "client")) {
             return;
+        } else {
+            clear_characters_of_table();
         }
     }
 }
@@ -141,70 +148,67 @@ int get_values(char *statement, COMMAND_TO_DO command) {
     return num_values;
 }
 
-client *create_client(const char *name,const char *address, const int code, const char* phone, const char* birth) {
-    client *new_client = malloc(sizeof(client));
-
-    strncpy(new_client->name, name, 50);
-    strncpy(new_client->address, address, 100);
-    strncpy(new_client->phone, phone, 20);
-    strncpy(new_client->birth, birth, 20);
-
-    new_client->code = code;
-    new_client->next = NULL;
-
-    return new_client;
-}
-
-void add_client(client **list, const char* name, const char* address, const char* phone, const char* birth, const int code) {
-    client* new_client = create_client(name, address, code, phone, birth);
-    new_client->next = *list;
-    *list = new_client;
-}
-
-int count_executions() {
+int count_ids_of_table(const char* bin_filename) {
     int count = 0;
 
     // Open the binary file for reading and writing
-    FILE *file = fopen("execution_count.bin", "rb+");
+    FILE *file = fopen(bin_filename, "rb+");
 
     // If the file doesn't exist, create it and initialize the count to 0
     if (file == NULL) {
-        file = fopen("execution_count.bin", "wb");
+        file = fopen(bin_filename, "wb");
         if (file == NULL) {
-            perror("Failed to create file");
+            printf("Arquivo nulo!");
             return -1;
         }
         fwrite(&count, sizeof(int), 1, file);
         fclose(file);
-        file = fopen("execution_count.bin", "rb+");
+        file = fopen(bin_filename, "rb+");
         if (file == NULL) {
-            perror("Failed to open file");
+            printf("Arquivo nulo!");
             return -1;
         }
     }
 
-    // Read the current count from the file
     fread(&count, sizeof(int), 1, file);
-
-    // Increment the count
     count++;
-
-    // Move the file pointer to the beginning of the file
+    // Move de volta para o inicio do arquivo
     rewind(file);
-
-    // Write the updated count back to the file
+    // escrevendo o novo valor no count
     fwrite(&count, sizeof(int), 1, file);
-
-    // Close the file
     fclose(file);
 
     return count;
 }
 
+client *create_client() {
+    client *new_client = malloc(sizeof(client));
+
+    int code_of_client = count_ids_of_table("client_table.bin");
+    // Essa IDE reclama mais que minhas kenga :P
+    char code = code_of_client + '0';
+
+    strcpy(new_client->name, finded_values[0]);
+    strcpy(new_client->address, finded_values[1]);
+    strcpy(new_client->phone, finded_values[2]);
+    strcpy(new_client->birth,  finded_values[3]);
+    strcpy(new_client->code, &code);
+
+    new_client->next = NULL;
+
+    return new_client;
+}
+
+void add_client(client **list) {
+    client* new_client = create_client();
+    new_client->next = *list;
+    *list = new_client;
+}
+
 pet* create_pet() {
     pet *new_pet = malloc(sizeof(pet));
 
-    int code_of_pet = count_executions();
+    int code_of_pet = count_ids_of_table("pet_table.bin");
     // Essa IDE reclama mais que minhas kenga :P
     char code = code_of_pet + '0';
 
@@ -240,10 +244,14 @@ void show_list(pet* head) {
 void do_insert() {
 
     if(!strcmp(table, "pet")) {
-        printf("INSERT EM PET");
-        pet *list = deserialize_pet("pet_list.bin");
+        printf("INSERT EM PET\n");
+        pet *list = deserialize_pet("pet_table.bin");
         add_pet(&list);
-        serialize_pet(list, "pet_list.bin");
+        serialize_pet(list, "pet_table.bin");
+    }
+
+    if(!strcmp(table, "client")) {
+        printf("INSERT EM CLIENT\n");
     }
 }
 
@@ -252,13 +260,14 @@ void add_command(char *statement) {
     switch(check_syntax(statement)) {
         case DO_INSERT:
             check_table(statement, DO_INSERT);
-            if(!table) {
-                printf("Tabela nao reconhecida");
-                free(table);
+
+            if(table[0] == 0) {
+                printf("Tabela nao reconhecida!\n");
                 return;
             };
+
             verify_fields(statement, DO_INSERT, table);
-            get_values(statement, DO_INSERT); // Get values and set operation
+            get_values(statement, DO_INSERT);
             do_insert();
             break;
         case COMMAND_NOT_RECOGNIZED:
@@ -269,11 +278,11 @@ void add_command(char *statement) {
 
 int main() {
 
-    printf("TEST DESERIALIZE PET_LIST: \n");
-
-    pet *lista_deserializada = deserialize_pet("pet_list.bin");
-    show_list(lista_deserializada);
-
-    free(lista_deserializada);
+/*
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, 'Jack', 3)");
+    pet *list = NULL;
+    list = deserialize_pet("pet_table.bin");
+    show_list(list);
     return 0;
+*/
 }
