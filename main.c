@@ -17,9 +17,26 @@ char table[9];
 
 COMMAND_TO_DO check_syntax(char *statement) {
 
+    char *select_all_from_pet_type = "select * from pet_type;";
+    char *select_all_from_pet = "select * from pet;";
+    char *select_all_from_client = "select * from client;";
+
     if(!strncmp(statement, INSERT_COMMAND, 6)) {
         return DO_INSERT;
     }
+
+    if(!strcmp(statement, select_all_from_pet)) {
+        return SELECT_ALL_FROM_PET;
+    }
+
+    if(!strcmp(statement, select_all_from_pet_type)) {
+        return SELECT_ALL_FROM_PET_TYPE;
+    }
+
+    if(!strcmp(statement, select_all_from_client)) {
+        return SELECT_ALL_FROM_CLIENT;
+    }
+
 
     return COMMAND_NOT_RECOGNIZED;
 };
@@ -392,33 +409,58 @@ void add_command(char *statement) {
             get_values(statement, DO_INSERT);
             do_insert();
             break;
-        case COMMAND_NOT_RECOGNIZED:
-            printf("Comando nao reconhecido!");
-        break;
+
+        case SELECT_ALL_FROM_PET:
+            pet *pet_list = NULL;
+            pet_list = deserialize_pet("pet_table.bin");
+            show_pet_list(pet_list);
+            break;
+        case SELECT_ALL_FROM_PET_TYPE:
+            pet_type *pet_type_list = NULL;
+            pet_type_list = deserialize_pet_type("pet_type_table.bin");
+            show_pet_type_list(pet_type_list);
+            break;
+        case SELECT_ALL_FROM_CLIENT:
+            client *client_list = NULL;
+            client_list = deserialize_client("client_table.bin");
+            show_client_list(client_list);
+            break;
+
+        default: ;
     }
 }
 
 int main() {
     // TESTANDO INSERT CLIENT TABLE
+    /*
+        add_command("insert into client(name, phone, birth, address) values(Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
+        client *list = NULL;
+        list = deserialize_client("client_table.bin");
+        show_client_list(list);
+
+
+        printf("\nTeste pet\n");
+
+
+        add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+        pet *pet_list = NULL;
+        pet_list = deserialize_pet("pet_table.bin");
+        show_pet_list(pet_list);
+    */
+
+    // TESTANDO INSERT EM CLIENT
+    /*
+        add_command("insert into pet_type(desc) values(bulldog);");
+        pet_type *pet_type_list = NULL;
+        pet_type_list = deserialize_pet_type("pet_type_table.bin");
+        show_pet_type_list(pet_type_list);
+    */
 /*
-    add_command("insert into client(name, phone, birth, address) values(Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
-    client *list = NULL;
-    list = deserialize_client("client_table.bin");
-    show_client_list(list);
-
-
-    printf("\nTeste pet\n");
-
-
-    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
-    pet *pet_list = NULL;
-    pet_list = deserialize_pet("pet_table.bin");
-    show_pet_list(pet_list);
+ *
+ *  THE SELECT * TEST
+    add_command("select * from client;");
+    add_command("select * from client;");
+    add_command("select * from client;");
 */
-    add_command("insert into pet_type(desc) values(bulldog);");
-    pet_type *pet_type_list = NULL;
-    pet_type_list = deserialize_pet_type("pet_type_table.bin");
-    show_pet_type_list(pet_type_list);
-
     return 0;
 }

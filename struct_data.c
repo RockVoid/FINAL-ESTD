@@ -32,5 +32,8 @@ typedef struct command {
 
 typedef enum {
     DO_INSERT,
+    SELECT_ALL_FROM_PET,
+    SELECT_ALL_FROM_PET_TYPE,
+    SELECT_ALL_FROM_CLIENT,
     COMMAND_NOT_RECOGNIZED
 } COMMAND_TO_DO;
