@@ -4,7 +4,7 @@
 void serialize_client(client *lista, const char* filename) {
     FILE* file = fopen(filename, "wb");
     if(!file) {
-        printf("Não foi possivel abrir o arquivo!");
+        printf("Nao foi possivel abrir o arquivo.");
         return;
     }
 
@@ -21,7 +21,6 @@ void serialize_client(client *lista, const char* filename) {
 
 
     fclose(file);
-    printf("Linked list saved to %s\n", filename);
 }
 
 void serialize_pet_type(pet_type *lista, const char* filename) {

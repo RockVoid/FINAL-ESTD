@@ -136,14 +136,46 @@ int verify_fields(char *statement, COMMAND_TO_DO command) {
         }
     }
 
+    if(!strcmp(table, "client")) {
+        fields_of_table_start = 12;
+        fields_of_table_ends = 35;
+
+        strncpy(fields, statement + fields_of_table_start, fields_of_table_ends);
+
+        switch(command) {
+            case DO_INSERT:
+                num_fields = extract_words(fields, table, finded_fields);
+            break;
+            default:
+                return num_fields;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if(strcmp(finded_fields[i], client_table_fields[i]) != 0) {
+                printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
+                return 0;
+            }
+        }
+    }
+
     return 1;
 }
 
 int get_values(char *statement, COMMAND_TO_DO command) {
     int num_values = 0;
-    int values_of_table_start = 50;
-    int values_of_table_end = 55;
-    char result[50];
+    int values_of_table_start = 0;
+    int values_of_table_end = 0;
+    char result[100];
+
+    if(!strcmp(table, "pet")) {
+        values_of_table_start = 50;
+        values_of_table_end = 55;
+    }
+
+    if(!strcmp(table, "client")) {
+        values_of_table_start = 48;
+        values_of_table_end = 80;
+    }
 
     if(command == DO_INSERT) {
         strncpy(result, statement + values_of_table_start, values_of_table_end);
@@ -191,13 +223,13 @@ int count_ids_of_table(const char* bin_filename) {
 client *create_client() {
     client *new_client = malloc(sizeof(client));
 
-    int code_of_client = count_ids_of_table("client_table.bin");
     // Essa IDE reclama mais que minhas kenga :P
+    int code_of_client = count_ids_of_table("client_table_count.bin");
 
     strcpy(new_client->name, finded_values[0]);
-    strcpy(new_client->address, finded_values[1]);
-    strcpy(new_client->phone, finded_values[2]);
-    strcpy(new_client->birth,  finded_values[3]);
+    strcpy(new_client->phone, finded_values[1]);
+    strcpy(new_client->birth, finded_values[2]);
+    strcpy(new_client->address,  finded_values[3]);
     new_client->code = code_of_client;
 
     new_client->next = NULL;
@@ -229,7 +261,7 @@ void add_client(client **list) {
 pet* create_pet() {
     pet *new_pet = malloc(sizeof(pet));
 
-    int code_of_pet = count_ids_of_table("pet_table.bin");
+    int code_of_pet = count_ids_of_table("pet_table_count.bin");
 
     strcpy(new_pet->code_client, finded_values[0]);
     new_pet->code = code_of_pet;
@@ -272,6 +304,9 @@ void do_insert() {
 
     if(!strcmp(table, "client")) {
         printf("INSERT EM CLIENT\n");
+        client *list = deserialize_client("client_table.bin");
+        add_client(&list);
+        serialize_client(list, "client_table.bin");
     }
 }
 
@@ -298,18 +333,19 @@ void add_command(char *statement) {
 
 int main() {
 
+/*
     // TESTANDO INSERT CLIENT TABLE
 
-    add_command("insert into client(name, phone, birth, address) values (Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
+    add_command("insert into client(name, phone, birth, address) values(Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
     client *list = NULL;
     list = deserialize_client("client_table.bin");
     show_client_list(list);
+*/
 
-    /*
-        add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
-        pet *list = NULL;
-        list = deserialize_pet("pet_table.bin");
-        show_pet_list(list);
-    */
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+    pet *list = NULL;
+    list = deserialize_pet("pet_table.bin");
+    show_pet_list(list);
+
     return 0;
 }
