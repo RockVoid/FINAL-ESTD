@@ -158,6 +158,30 @@ int verify_fields(char *statement, COMMAND_TO_DO command) {
         }
     }
 
+    if(!strcmp(table, "pet_type")) {
+        fields_of_table_start = 11;
+        fields_of_table_ends = 22;
+
+        strncpy(fields, statement + fields_of_table_start, fields_of_table_ends);
+
+        switch(command) {
+            case DO_INSERT:
+                num_fields = extract_words(fields, table, finded_fields);
+            break;
+            default:
+                return num_fields;
+        }
+
+        // Por que um loop que só executa uma vez?
+        // Para manter um padrão e manter o principio Open-Closed caso a tabela venha a ter mais campos no futuro
+        for (int i = 0; i < 1; i++) {
+            if(strcmp(finded_fields[i], pet_type_table_fields[i]) != 0) {
+                printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
+                return 0;
+            }
+        }
+    }
+
     return 1;
 }
 
@@ -332,20 +356,22 @@ void add_command(char *statement) {
 }
 
 int main() {
-
-/*
     // TESTANDO INSERT CLIENT TABLE
 
     add_command("insert into client(name, phone, birth, address) values(Roque, 99-9999-9999, 12-08-2001, 'Rua Dos Tabajaras')");
     client *list = NULL;
     list = deserialize_client("client_table.bin");
     show_client_list(list);
-*/
+
+
+    printf("\nTeste pet\n");
+
 
     add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
-    pet *list = NULL;
-    list = deserialize_pet("pet_table.bin");
-    show_pet_list(list);
+    pet *pet_list = NULL;
+    pet_list = deserialize_pet("pet_table.bin");
+    show_pet_list(pet_list);
+
 
     return 0;
 }
