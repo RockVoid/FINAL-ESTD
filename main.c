@@ -317,9 +317,40 @@ void show_pet_list(pet* head) {
     while (aux) {
         printf("\n========================================================\n");
         printf("\nCode: %d\nName: %s\nCode_pet: %s\nDono: %s\n", aux->code, aux->name, aux->pet_type_code, aux->code_client);
-        //printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
         aux = aux->next;
     }
+}
+
+void show_pet_type_list(pet_type* head) {
+    if (!head) {
+        printf("A lista esta vazia!\n");
+        return;
+    }
+    pet_type* aux = head;
+    while (aux) {
+        printf("\n========================================================\n");
+        printf("\nCode: %d\nDesc: %s\n", aux->code, aux->desc);
+        aux = aux->next;
+    }
+}
+
+pet_type* create_pet_type() {
+    pet_type *new_pet_type = malloc(sizeof(pet_type));
+
+    int code_of_pet_type = count_ids_of_table("pet_type_table_count.bin");
+
+    strcpy(new_pet_type->desc, finded_values[0]);
+    new_pet_type->code = code_of_pet_type;
+
+    new_pet_type->next = NULL;
+
+    return new_pet_type;
+}
+
+void add_pet_type(pet_type** head) {
+    pet_type *new_pet_type = create_pet_type();
+    new_pet_type->next = *head;
+    *head = new_pet_type;
 }
 
 void do_insert() {
@@ -340,11 +371,9 @@ void do_insert() {
 
     if(!strcmp(table, "pet_type")) {
         printf("\nINSERT EM PET TYPE\n");
-        /*
-         *pet_type *list = deserialize_pet_type("pet_type_table.bin");
+         pet_type *list = deserialize_pet_type("pet_type_table.bin");
          add_pet_type(&list);
          serialize_pet_type(list, "pet_type_table.bin");
-        */
     }
 }
 
@@ -387,5 +416,9 @@ int main() {
     show_pet_list(pet_list);
 */
     add_command("insert into pet_type(desc) values(bulldog);");
+    pet_type *pet_type_list = NULL;
+    pet_type_list = deserialize_pet_type("pet_type_table.bin");
+    show_pet_type_list(pet_type_list);
+
     return 0;
 }

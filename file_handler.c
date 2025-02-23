@@ -33,8 +33,8 @@ void serialize_pet_type(pet_type *lista, const char* filename) {
     pet_type *current = lista;
 
         while(current) {
-            fwrite(current->desc, sizeof(char), 100, file);
             fwrite(&(current->code), sizeof(int), 1, file);
+            fwrite(current->desc, sizeof(char), 100, file);
             current = current->next;
         }
 
@@ -138,6 +138,42 @@ client* deserialize_client(const char* filename) {
         } else {
             current->next = (struct client*) new_client;
             current = (client*) current->next;
+        }
+    }
+
+    fclose(file);
+    return head;
+}
+
+pet_type* deserialize_pet_type(const char* filename) {
+    FILE* file = fopen(filename, "rb");
+    if (!file) {
+        printf("Não foi possível abrir o arquivo!");
+        return NULL;
+    }
+
+    pet_type *head = NULL;
+    pet_type *current = NULL;
+
+    while(1) {
+
+        pet_type *new_pet_type = malloc(sizeof(pet_type));
+        new_pet_type->next = NULL;
+
+        size_t new_pet_type_code = fread(&(new_pet_type->code), sizeof(int), 1, file);
+        size_t new_pet_type_desc = fread(new_pet_type->desc, sizeof(char), 100, file);
+
+        if (new_pet_type_code != 1 || new_pet_type_desc != 100) {
+            free(new_pet_type);
+            break;
+        }
+
+        if(!head) {
+            head = new_pet_type;
+            current = head;
+        } else {
+            current->next = new_pet_type;
+            current = current->next;
         }
     }
 
