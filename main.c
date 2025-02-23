@@ -209,11 +209,9 @@ pet* create_pet() {
     pet *new_pet = malloc(sizeof(pet));
 
     int code_of_pet = count_ids_of_table("pet_table.bin");
-    // Essa IDE reclama mais que minhas kenga :P
-    char code = code_of_pet + '0';
 
     strcpy(new_pet->code_client, finded_values[0]);
-    strcpy(new_pet->code, &code);
+    new_pet->code = code_of_pet;
     strcpy(new_pet->name, finded_values[1]);
     strcpy(new_pet->pet_type_code, finded_values[2]);
 
@@ -228,14 +226,15 @@ void add_pet(pet **pet_list) {
     *pet_list = new_pet;
 }
 
-void show_list(pet* head) {
+void show_pet_list(pet* head) {
     if (!head) {
         printf("A lista esta vazia!\n");
         return;
     }
     pet* aux = head;
     while (aux) {
-        printf("\nName: %s\nCode_pet: %s\nDono: %s", aux->name, aux->pet_type_code, aux->code_client);
+        printf("\n========================================================\n");
+        printf("\nCode: %d\nName: %s\nCode_pet: %s\nDono: %s\n", aux->code, aux->name, aux->pet_type_code, aux->code_client);
         //printf("Name: %s\nAddress: %s\nCode: %d\nBirth: %s\nPhone: %s", aux->name, aux->address, aux->code, aux->birth, aux->phone);
         aux = aux->next;
     }
@@ -278,11 +277,10 @@ void add_command(char *statement) {
 
 int main() {
 
-/*
     add_command("insert into pet(code_client, name, pet_type_code) values(2, 'Jack', 3)");
     pet *list = NULL;
     list = deserialize_pet("pet_table.bin");
-    show_list(list);
+    show_pet_list(list);
     return 0;
-*/
+
 }
