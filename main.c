@@ -21,6 +21,8 @@ COMMAND_TO_DO check_syntax(char *statement) {
     char *select_all_from_pet = "select * from pet;";
     char *select_all_from_client = "select * from client;";
 
+    char *delete_all_from_pet = "delete from pet where code = 2;";
+
     if(!strncmp(statement, INSERT_COMMAND, 6)) {
         return DO_INSERT;
     }
@@ -37,6 +39,9 @@ COMMAND_TO_DO check_syntax(char *statement) {
         return SELECT_ALL_FROM_CLIENT;
     }
 
+    if(!strcmp(statement, delete_all_from_pet)) {
+        return DELETE_WHERE_PET;
+    }
 
     return COMMAND_NOT_RECOGNIZED;
 };
@@ -147,7 +152,7 @@ int verify_fields(char *statement, COMMAND_TO_DO command) {
 
         for (int i = 0; i < 3; i++) {
             if(strcmp(finded_fields[i], pet_table_fields[i]) != 0) {
-                printf("Campo '%s' nao existe na tabela %s", finded_fields[i], table);
+                printf("Campo '%s' nao existe na tabela %s\n", finded_fields[i], table);
                 return 0;
             }
         }
@@ -173,6 +178,8 @@ int verify_fields(char *statement, COMMAND_TO_DO command) {
                 return 0;
             }
         }
+
+        return 1;
     }
 
     if(!strcmp(table, "pet_type")) {
@@ -394,6 +401,47 @@ void do_insert() {
     }
 }
 
+/*
+pet *buscar(pet *lista, int valor)
+{
+    pet *aux = lista;
+    while (aux && aux->code != valor)
+        aux = aux->next;
+    return aux;
+}
+*/
+
+int delete_pet(pet **pet_list, int code) {
+    if(!(*pet_list)) {
+        printf("Lista vazia ao tentar remover pet com codigo: %d\n", code);
+        return 0;
+    }
+    pet *aux = *pet_list;
+    pet *ant = NULL;
+
+    if((*pet_list)->code == code){
+        *pet_list = (*pet_list)->next;
+        free(aux);
+        return 1;
+    }
+    while(aux && aux->code != code){
+        ant = aux;
+        aux = aux->next;
+    }
+
+    if(!aux) {
+        printf("Pet com o codigo %d nao encontrado!", code);
+        return 0;
+    }
+
+    if(aux->code == code) {
+        ant->next = aux->next;
+        free(aux);
+    }
+
+    return 1;
+}
+
 void add_command(char *statement) {
 
     switch(check_syntax(statement)) {
@@ -415,17 +463,24 @@ void add_command(char *statement) {
             pet_list = deserialize_pet("pet_table.bin");
             show_pet_list(pet_list);
             break;
+
         case SELECT_ALL_FROM_PET_TYPE:
             pet_type *pet_type_list = NULL;
             pet_type_list = deserialize_pet_type("pet_type_table.bin");
             show_pet_type_list(pet_type_list);
             break;
+
         case SELECT_ALL_FROM_CLIENT:
             client *client_list = NULL;
             client_list = deserialize_client("client_table.bin");
             show_client_list(client_list);
             break;
 
+        case DELETE_WHERE_PET:
+            pet *pet_list_delete = NULL;
+            pet_list_delete = deserialize_pet("pet_table.bin");
+            delete_pet(&pet_list_delete, 2);
+            serialize_pet(pet_list_delete, "pet_table.bin");
         default: ;
     }
 }
@@ -459,8 +514,19 @@ int main() {
  *
  *  THE SELECT * TEST
     add_command("select * from client;");
-    add_command("select * from client;");
-    add_command("select * from client;");
+    add_command("select * from pet;");
+    add_command("select * from pet_type;");
 */
+
+/*
+    // TESTANDO DELETE EM PET
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+    add_command("delete from pet where code = 2;");
+    add_command("select * from pet;");
+*/
+    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
+    add_command("select * from pet;");
     return 0;
 }

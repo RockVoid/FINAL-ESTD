@@ -46,7 +46,7 @@ void serialize_pet_type(pet_type *lista, const char* filename) {
 void serialize_pet(pet *lista, const char* filename) {
     FILE* file = fopen(filename, "wb");
     if(!file) {
-        printf("Não foi possivel abrir o arquivo!");
+        printf("\nNao foi possivel abrir a tabela! \nCriando tabela...\n");
         return;
     }
 
@@ -67,7 +67,7 @@ void serialize_pet(pet *lista, const char* filename) {
 pet* deserialize_pet(const char* filename) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
-        printf("Não foi possível abrir o arquivo!");
+        printf("\nTabela pet nao encontrada!\n");
         return NULL;
     }
 
