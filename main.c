@@ -21,7 +21,9 @@ COMMAND_TO_DO check_syntax(char *statement) {
     char *select_all_from_pet = "select * from pet;";
     char *select_all_from_client = "select * from client;";
 
-    char *delete_all_from_pet = "delete from pet where code = 2;";
+    char *delete_all_from_pet = "delete * from pet;";
+    char *delete_all_from_client = "delete * from client;";
+    char *delete_all_from_pet_type = "delete * from pet_type;";
 
     if(!strncmp(statement, INSERT_COMMAND, 6)) {
         return DO_INSERT;
@@ -40,7 +42,15 @@ COMMAND_TO_DO check_syntax(char *statement) {
     }
 
     if(!strcmp(statement, delete_all_from_pet)) {
-        return DELETE_WHERE_PET;
+        return DELETE_ALL_FROM_PET;
+    }
+
+    if(!strcmp(statement, delete_all_from_client)) {
+        return DELETE_ALL_FROM_CLIENT;
+    }
+
+    if(!strcmp(statement, delete_all_from_pet_type)) {
+        return DELETE_ALL_FROM_PET_TYPE;
     }
 
     return COMMAND_NOT_RECOGNIZED;
@@ -442,6 +452,20 @@ int delete_pet(pet **pet_list, int code) {
     return 1;
 }
 
+void  delete_all_from_pet(pet **pet_list) {
+    if(!(*pet_list)) {
+        printf("\nNada para remover da tabela!\n");
+        return;
+    }
+
+    pet *aux = *pet_list;
+    while(aux) {
+        *pet_list = (*pet_list)->next;
+        free(aux);
+        aux = *pet_list;
+    }
+}
+
 void add_command(char *statement) {
 
     switch(check_syntax(statement)) {
@@ -476,10 +500,10 @@ void add_command(char *statement) {
             show_client_list(client_list);
             break;
 
-        case DELETE_WHERE_PET:
+        case DELETE_ALL_FROM_PET:
             pet *pet_list_delete = NULL;
             pet_list_delete = deserialize_pet("pet_table.bin");
-            delete_pet(&pet_list_delete, 2);
+            delete_all_from_pet(&pet_list_delete);
             serialize_pet(pet_list_delete, "pet_table.bin");
         default: ;
     }
@@ -526,7 +550,6 @@ int main() {
     add_command("delete from pet where code = 2;");
     add_command("select * from pet;");
 */
-    add_command("insert into pet(code_client, name, pet_type_code) values(2, Jack, 3)");
-    add_command("select * from pet;");
+    add_command("select * from pet");
     return 0;
 }
