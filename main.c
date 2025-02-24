@@ -466,6 +466,20 @@ void  delete_all_from_pet(pet **pet_list) {
     }
 }
 
+void  delete_all_from_client(client **client_list) {
+    if(!(*client_list)) {
+        printf("\nNada para remover da tabela!\n");
+        return;
+    }
+
+    client *aux = *client_list;
+    while(aux) {
+        *client_list = (*client_list)->next;
+        free(aux);
+        aux = *client_list;
+    }
+}
+
 void add_command(char *statement) {
 
     switch(check_syntax(statement)) {
@@ -505,6 +519,12 @@ void add_command(char *statement) {
             pet_list_delete = deserialize_pet("pet_table.bin");
             delete_all_from_pet(&pet_list_delete);
             serialize_pet(pet_list_delete, "pet_table.bin");
+
+        case DELETE_ALL_FROM_CLIENT:
+            client *client_list_delete = NULL;
+            client_list_delete = deserialize_client("client_table.bin");
+            delete_all_from_client(&client_list_delete);
+            serialize_client(client_list_delete, "client_table.bin");
         default: ;
     }
 }
@@ -550,6 +570,7 @@ int main() {
     add_command("delete from pet where code = 2;");
     add_command("select * from pet;");
 */
-    add_command("select * from pet");
+
+
     return 0;
 }
